@@ -114,60 +114,39 @@ function check_from_file()
 {
 	# location of input file
 	input="/root/Documents/test.txt"
+	nmapLog_file="/root/Documents/nmap_log.log"
+	nmapLog_xml="/root/Documents/nmap_log.xml"
 	# command/process to read file line by line
 	while IFS= read -r line
 	do
-		#echo "$line"
-
 		# , is the delimiter and each field in each
 		#line of file is stored in an array
 		IFS=', ' read -r -a array <<< "$line"
-		# for each index in array
-		for index in "${!array[@]}"
-		do
-			#echo "$index ${array[index]}"
+
+			# ping test with ip
+			pingtest ${array[0]}
 			
-			# if index is 0 then pingtest
-			if [ "$index" = "0" ]; then
-				pingtest ${array[0]}
-			fi
+			# arp check with ip and MAC
+			arpcheck ${array[0]} ${array[1]}
+
+			# split up array of ports delimited by ;'
+			IFS='; ' read -r -a port_array <<< "${array[2]}"
 			
-			# if index is 1 then arpcheck
-			if [ "$index" = "1" ]; then
-				arpcheck ${array[0]} ${array[1]}
-			fi
-
-			# if index is 2 then service check
-			if [ "$index" = "2" ]; then
-				# split up array of ports delimited
-				# by ;
-				IFS='; ' read -r -a port_array <<< "${array[index]}"
-				# for each element in port array
-				for element in "${port_array[@]}"
-				do	
-					port="$element" #"$(cut -d'/' -f1 <<<"$element")"
-					echo "$port"
-					# call servicecheck with
-					# IP and port
-					servicecheck ${array[0]} $port
-
-				done
-
-			# checks ports 0 through 1024 to see if they are open
-			for i in {0..1024}
-			do
-				port="$i"
-				# concatenate /tcp to the end of
-				# port number
-				port="${port}/tcp"
-				echo "$port"
+			# for each element in port array
+			for element in "${port_array[@]}"
+			do	
+				# port is each element in port array
+				port="$element"
+				#echo "$port"
 				# call servicecheck with IP and port
 				servicecheck ${array[0]} $port
-			done
-				
-			fi
 
-		done
+			done
+			
+			# save nmap results to xml
+			#nmap -T4 -oX $nmapLog_xml ${array[0]}
+			# save nmap results to .log file
+			#nmap -T4 -oG $nmapLog_file ${array[0]}
 		
 	done <"$input"
 }
