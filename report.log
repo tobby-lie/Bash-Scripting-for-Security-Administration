@@ -1,0 +1,9 @@
+Tue 08 Oct 2019 08:25:04 PM EDT Windows machine on IP 192.168.10.201 is responding normally
+Tue 08 Oct 2019 08:25:14 PM EDT Windows machine on IP 192.168.10.201 is not responding with a wrong hardware address 00:0c:29:7a:bc:c4 and is different from 00:0c:29:bc:e8:3c
+Tue 08 Oct 2019 08:25:28 PM EDT port 3/tcp is open on Windows machine on IP 192.168.10.201
+Tue 08 Oct 2019 08:25:58 PM EDT port 135/tcp is open on Windows machine on IP 192.168.10.201
+Tue 08 Oct 2019 08:26:13 PM EDT port 139/tcp is open on Windows machine on IP 192.168.10.201
+Tue 08 Oct 2019 08:27:30 PM EDT port 2/tcp is open on Windows machine on IP 192.168.10.201
+Tue 08 Oct 2019 08:27:46 PM EDT port 3/tcp is open on Windows machine on IP 192.168.10.201
+Tue 08 Oct 2019 08:28:01 PM EDT port 4/tcp is open on Windows machine on IP 192.168.10.201
+Tue 08 Oct 2019 08:28:15 PM EDT port 5/tcp is open on Windows machine on IP 192.168.10.201
