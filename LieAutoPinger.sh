@@ -64,8 +64,8 @@ function arpcheck()
 {
 	# Use arp command to get MAC address of server
 	arp=`arp $1 | tail -1 | cut -c34-50`
-	echo $arp
-	echo $2
+	#echo $arp
+	#echo $2
 	# if arp is ne to passed in MAC then issue warning
 	if [ "$arp" != "$2" ]; then
 		echo `date` Windows machine on IP $1 is not responding with a wrong hardware address $arp and is different from $2 >> $logfile
@@ -114,7 +114,7 @@ function check_from_file()
 {
 	# location of input file
 	input="/root/Documents/test.txt"
-	nmapLog_file="/root/Documents/nmap_log.log"
+	nmapLog_file="/root/Documents/nmap_log.txt"
 	nmapLog_xml="/root/Documents/nmap_log.xml"
 	# command/process to read file line by line
 	while IFS= read -r line
@@ -128,6 +128,24 @@ function check_from_file()
 			
 			# arp check with ip and MAC
 			arpcheck ${array[0]} ${array[1]}
+			
+			# call nmap on ip and get the last 13
+			# lines from result
+			thelog=`nmap ${array[0]} | tail -n 13`
+			# put the first 11 lines which are the open ports
+			# and store in var1
+			var1=$(echo $thelog | head -n 11)
+
+			# create string array separated by blank space
+			IFS=' ' read -r -a ARR <<< "$var1"
+			# for every element of the array of strings
+			# if there is a / in an element then we say
+			# that port is open on the ip and write to logfile
+			for i in "${ARR[@]}"; do
+				if [[ $i == *"/"* ]]; then
+					echo `date` port $i is open on Windows machine on IP ${array[0]} >> $logfile
+				fi
+			done
 
 			# split up array of ports delimited by ;'
 			IFS='; ' read -r -a port_array <<< "${array[2]}"
@@ -135,19 +153,23 @@ function check_from_file()
 			# for each element in port array
 			for element in "${port_array[@]}"
 			do	
+
 				# port is each element in port array
-				port="$element"
-				#echo "$port"
+				port="${element}/tcp"
+				
 				# call servicecheck with IP and port
-				servicecheck ${array[0]} $port
+				# if port is already in ARR then this means
+				# we do not need to check if that port is open
+				# we already know that it is and can therfore
+				# move on
+				if [[ "${ARR[*]}" == *"$port"* ]]; then
+					continue
+				else
+					servicecheck ${array[0]} $port
+				fi
 
 			done
 			
-			# save nmap results to xml
-			#nmap -T4 -oX $nmapLog_xml ${array[0]}
-			# save nmap results to .log file
-			#nmap -T4 -oG $nmapLog_file ${array[0]}
-		
 	done <"$input"
 }
 
